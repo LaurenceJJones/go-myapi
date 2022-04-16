@@ -71,11 +71,11 @@ func getRepos() []repo {
 		}
 		setRedis(redisSetArgs{
 			Key:   "github",     // Redis key
-			Value: string(body), //Body is bytes so conver to string
+			Value: string(body), // Body is bytes so convert to string
 			Exp:   60 * 60,      // Set to expire after an hour
 		})
 	}
-	//Unmarshal body of bytes to []repo
+	//Unmarshal body of bytes to []repo{}
 	if json.Unmarshal(body, &repos) != nil {
 		panic(err)
 	}
