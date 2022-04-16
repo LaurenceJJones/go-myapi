@@ -96,7 +96,7 @@ func main() {
 	r.GET("/github", func(ctx *gin.Context) {
 		repos, err := getRepos()
 		if err != nil {
-			ctx.JSON(http.StatusBadRequest, gin.H{
+			ctx.JSON(http.StatusInternalServerError, gin.H{
 				"message": "Error occured",
 			})
 		} else {
