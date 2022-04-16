@@ -59,6 +59,7 @@ func getRedis(Key string) *redis.StringCmd {
 func getRepos() ([]repo, error) {
 	repos := []repo{}
 	body, err := getRedis("github").Bytes()
+	//Check if err is redis.Nil key does not exist
 	if err == redis.Nil {
 		res, err := http.Get("https://api.github.com/users/laurencejjones/repos")
 		if err != nil {
@@ -75,6 +76,7 @@ func getRepos() ([]repo, error) {
 			Exp:   60 * 60,      // Set to expire after an hour
 		})
 	} else if err != nil {
+		//Handle other errors
 		return repos, err
 	}
 	//Unmarshal body of bytes to []repo{}
@@ -85,6 +87,7 @@ func getRepos() ([]repo, error) {
 	sort.Slice(repos, func(i, j int) bool {
 		return repos[i].Forks > repos[j].Forks
 	})
+	//Return repos and nil cause no errors
 	return repos, nil
 }
 
