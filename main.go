@@ -56,10 +56,10 @@ func getRedis(Key string) *redis.StringCmd {
 	return getClient().Get(ctx, Key)
 }
 
-func getRepos() []repo {
+func getRepos() ([]repo, error) {
 	repos := []repo{}
 	body, err := getRedis("github").Bytes()
-	if err != nil {
+	if err == redis.Nil {
 		res, err := http.Get("https://api.github.com/users/laurencejjones/repos")
 		if err != nil {
 			panic(err)
@@ -74,6 +74,8 @@ func getRepos() []repo {
 			Value: string(body), // Body is bytes so convert to string
 			Exp:   60 * 60,      // Set to expire after an hour
 		})
+	} else if err != nil {
+		return []repo{}, err
 	}
 	//Unmarshal body of bytes to []repo{}
 	if json.Unmarshal(body, &repos) != nil {
@@ -83,13 +85,20 @@ func getRepos() []repo {
 	sort.Slice(repos, func(i, j int) bool {
 		return repos[i].Forks > repos[j].Forks
 	})
-	return repos
+	return repos, nil
 }
 
 func main() {
 	r := gin.Default()
 	r.GET("/github", func(ctx *gin.Context) {
-		ctx.JSON(http.StatusOK, getRepos())
+		repos, err := getRepos()
+		if err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{
+				"message": "Error occured",
+			})
+		} else {
+			ctx.JSON(http.StatusOK, repos)
+		}
 	})
 	r.Run()
 }
