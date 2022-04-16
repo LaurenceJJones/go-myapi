@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"sort"
 	"time"
@@ -71,14 +70,16 @@ func getRepos() []repo {
 			panic(err)
 		}
 		setRedis(redisSetArgs{
-			Key:   "github",
-			Value: string(body),
-			Exp:   60 * 60,
+			Key:   "github",     // Redis key
+			Value: string(body), //Body is bytes so conver to string
+			Exp:   60 * 60,      // Set to expire after an hour
 		})
 	}
+	//Unmarshal body of bytes to []repo
 	if json.Unmarshal(body, &repos) != nil {
 		panic(err)
 	}
+	//Sort []repo by number of Forks
 	sort.Slice(repos, func(i, j int) bool {
 		return repos[i].Forks > repos[j].Forks
 	})
@@ -87,20 +88,6 @@ func getRepos() []repo {
 
 func main() {
 	r := gin.Default()
-	r.GET("/set", func(ctx *gin.Context) {
-		var Args redisSetArgs
-		if ctx.ShouldBindQuery(&Args) == nil {
-			log.Println(Args)
-			setRedis(Args)
-			ctx.JSON(http.StatusOK, gin.H{
-				"messgage": "Set correctly",
-			})
-			return
-		}
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"message": "Error",
-		})
-	})
 	r.GET("/github", func(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, getRepos())
 	})
