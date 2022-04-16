@@ -62,12 +62,12 @@ func getRepos() ([]repo, error) {
 	if err == redis.Nil {
 		res, err := http.Get("https://api.github.com/users/laurencejjones/repos")
 		if err != nil {
-			panic(err)
+			return []repo{}, err
 		}
 		defer res.Body.Close()
 		body, err = ioutil.ReadAll(res.Body)
 		if err != nil {
-			panic(err)
+			return []repo{}, err
 		}
 		setRedis(redisSetArgs{
 			Key:   "github",     // Redis key
@@ -79,7 +79,7 @@ func getRepos() ([]repo, error) {
 	}
 	//Unmarshal body of bytes to []repo{}
 	if json.Unmarshal(body, &repos) != nil {
-		panic(err)
+		return []repo{}, err
 	}
 	//Sort []repo by number of Forks
 	sort.Slice(repos, func(i, j int) bool {
