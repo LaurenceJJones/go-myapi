@@ -93,6 +93,7 @@ func getRepos() ([]repo, error) {
 
 func main() {
 	r := gin.Default()
+	r.SetTrustedProxies([]string{"127.0.0.1"})
 	r.GET("/github", func(ctx *gin.Context) {
 		repos, err := getRepos()
 		if err != nil {
