@@ -40,6 +40,12 @@ type repo struct {
 	License     repoLicense `json:"license"`
 }
 
+type weatherRequest struct {
+	Location string `json:"location" binding:"required"`
+	Region   string `json:"region" binding:"required"`
+	Format   string `json:"format" binding:"required"`
+}
+
 func getClient() *redis.Client {
 	return redis.NewClient(&redis.Options{
 		Addr:     "127.0.0.1:6379",
@@ -102,6 +108,17 @@ func main() {
 			})
 		} else {
 			ctx.JSON(http.StatusOK, repos)
+		}
+	})
+	r.POST("/weather", func(ctx *gin.Context) {
+		var WeatherRequest weatherRequest
+		err := ctx.ShouldBindJSON(&WeatherRequest)
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, gin.H{
+				"message": "Error occured",
+			})
+		} else {
+			ctx.JSON(http.StatusOK, WeatherRequest)
 		}
 	})
 	r.Run()
