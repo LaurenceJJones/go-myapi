@@ -28,16 +28,16 @@ type repoLicense struct {
 }
 
 type repo struct {
-	Name        string    `json:"name"`
-	Description string    `json:"description"`
-	Link        string    `json:"html_url"`
-	Forks       int32     `json:"forks"`
-	Stars       int32     `json:"stargazers_count"`
-	Watchers    int32     `json:"watchers_count"`
-	CreatedAt   time.Time `json:"created_at"`
-	UpdatedAt   time.Time `json:"updated_at"`
-	Language    string    `json:"language"`
-	License     repoLicense
+	Name        string      `json:"name"`
+	Description string      `json:"description"`
+	Link        string      `json:"html_url"`
+	Forks       int32       `json:"forks"`
+	Stars       int32       `json:"stargazers_count"`
+	Watchers    int32       `json:"watchers_count"`
+	CreatedAt   time.Time   `json:"created_at"`
+	UpdatedAt   time.Time   `json:"updated_at"`
+	Language    string      `json:"language"`
+	License     repoLicense `json:"license"`
 }
 
 func getClient() *redis.Client {
